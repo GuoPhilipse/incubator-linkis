@@ -82,13 +82,19 @@ class DefaultEntranceExecutor(id: Long)
       orchestratorFuture.operate[ProgressProcessor](DefaultProgressOperation.PROGRESS_NAME)
     progressProcessor.doOnObtain(progressInfoEvent => {
       if (null != entranceJob) {
+        // Make sure to update the database, put it in front
+        try {
+          JobHistoryHelper.updateJobRequestMetrics(
+            entranceJob.getJobRequest,
+            progressInfoEvent.resourceMap,
+            progressInfoEvent.infoMap
+          )
+        } catch {
+          case e: Exception =>
+            logger.error("update job metrics error", e)
+        }
         entranceJob.getProgressListener.foreach(
           _.onProgressUpdate(entranceJob, progressInfoEvent.progress, entranceJob.getProgressInfo)
-        )
-        JobHistoryHelper.updateJobRequestMetrics(
-          entranceJob.getJobRequest,
-          progressInfoEvent.resourceMap,
-          progressInfoEvent.infoMap
         )
       }
     })
@@ -101,8 +107,8 @@ class DefaultEntranceExecutor(id: Long)
       orchestration: Orchestration
   ): Unit = {
     orchestrationResponse match {
-      case succeedResponose: SucceedTaskResponse =>
-        succeedResponose match {
+      case succeedResponse: SucceedTaskResponse =>
+        succeedResponse match {
           case resultSetResp: ResultSetTaskResponse =>
             logger.info(
               s"JobRequest : ${entranceExecuteRequest.jobId()} succeed to execute task, and get result."
@@ -160,7 +166,7 @@ class DefaultEntranceExecutor(id: Long)
           _.onLogUpdate(
             entranceExecuteRequest.getJob,
             LogUtils.generateInfo(
-              s"Congratuaions! Your job : ${entranceExecuteRequest.getJob.getId} executed with status succeed and ${entranceExecuteRequest.getJob
+              s"Congratulations! Your job : ${entranceExecuteRequest.getJob.getId} executed with status succeed and ${entranceExecuteRequest.getJob
                 .addAndGetResultSize(0)} results."
             )
           )
@@ -172,7 +178,7 @@ class DefaultEntranceExecutor(id: Long)
         }
       case _ =>
         val msg =
-          s"Job : ${entranceExecuteRequest.getJob.getId} , JobRequest id: ${entranceExecuteRequest.jobId()} returnd unknown response}"
+          s"Job : ${entranceExecuteRequest.getJob.getId} , JobRequest id: ${entranceExecuteRequest.jobId()} returned unknown response}"
         logger.error(msg)
         entranceExecuteRequest.getJob.getLogListener.foreach(
           _.onLogUpdate(entranceExecuteRequest.getJob, LogUtils.generateERROR(msg))
@@ -199,7 +205,7 @@ class DefaultEntranceExecutor(id: Long)
     jobReqBuilder.setCodeLogicalUnit(codeLogicalUnit)
     jobReqBuilder.setLabels(entranceExecuteRequest.getLabels)
     jobReqBuilder.setExecuteUser(entranceExecuteRequest.executeUser())
-    jobReqBuilder.setParams(entranceExecuteRequest.properties().asInstanceOf[util.Map[String, Any]])
+    jobReqBuilder.setParams(entranceExecuteRequest.properties())
     jobReqBuilder.build()
   }
 

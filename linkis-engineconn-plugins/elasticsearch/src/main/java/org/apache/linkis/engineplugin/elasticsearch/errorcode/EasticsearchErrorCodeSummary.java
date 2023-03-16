@@ -17,52 +17,31 @@
 
 package org.apache.linkis.engineplugin.elasticsearch.errorcode;
 
-public enum EasticsearchErrorCodeSummary {
-  CLUSTER_IS_BLANK(70112, "The elasticsearch cluster is empty(es集群为空)!", ""),
+import org.apache.linkis.common.errorcode.LinkisErrorCode;
+
+public enum EasticsearchErrorCodeSummary implements LinkisErrorCode {
+  CLUSTER_IS_BLANK(70112, "The elasticsearch cluster is empty(es集群为空)!"),
   RESPONSE_FAIL_IS_EMPTY(
       70113,
-      "EsEngineExecutor convert response fail, response content is empty(EsEngineExecutor response解析失败，response 内容为空).",
-      "");
+      "EsEngineExecutor convert response fail, response content is empty(EsEngineExecutor response解析失败，response 内容为空).");
 
   /** (errorCode)错误码 */
-  private int errorCode;
+  private final int errorCode;
   /** (errorDesc)错误描述 */
-  private String errorDesc;
-  /** Possible reasons for the error(错误可能出现的原因) */
-  private String comment;
+  private final String errorDesc;
 
-  EasticsearchErrorCodeSummary(int errorCode, String errorDesc, String comment) {
+  EasticsearchErrorCodeSummary(int errorCode, String errorDesc) {
     this.errorCode = errorCode;
     this.errorDesc = errorDesc;
-    this.comment = comment;
   }
 
+  @Override
   public int getErrorCode() {
     return errorCode;
   }
 
-  public void setErrorCode(int errorCode) {
-    this.errorCode = errorCode;
-  }
-
+  @Override
   public String getErrorDesc() {
     return errorDesc;
-  }
-
-  public void setErrorDesc(String errorDesc) {
-    this.errorDesc = errorDesc;
-  }
-
-  public String getComment() {
-    return comment;
-  }
-
-  public void setComment(String comment) {
-    this.comment = comment;
-  }
-
-  @Override
-  public String toString() {
-    return "errorCode: " + this.errorCode + ", errorDesc:" + this.errorDesc;
   }
 }

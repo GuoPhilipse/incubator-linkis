@@ -29,8 +29,10 @@ trait DsmQueryProtocol extends RequestProtocol {}
 /**
  * Query request of Data Source Information
  * @param id
+ *   datasource id
  */
-case class DsInfoQueryRequest(id: String, name: String, system: String) extends DsmQueryProtocol {
+case class DsInfoQueryRequest(id: String, name: String, system: String, envId: String = null)
+    extends DsmQueryProtocol {
 
   def isValid: Boolean = {
     (Option(id).isDefined || Option(name).isDefined) && Option(system).isDefined
@@ -44,7 +46,8 @@ case class DsInfoQueryRequest(id: String, name: String, system: String) extends 
  */
 case class DsInfoResponse(
     status: Boolean,
-    dsType: String,
-    params: util.Map[String, Object],
-    creator: String
+    dsType: String = "",
+    params: util.Map[String, Object] = new util.HashMap[String, Object](),
+    creator: String = "",
+    errorMsg: String = ""
 ) extends DsmQueryProtocol

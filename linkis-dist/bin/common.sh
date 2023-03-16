@@ -19,7 +19,7 @@ source ~/.bash_profile
 
 export local_host="`hostname --fqdn`"
 
-ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
+ipaddr=127.0.0.1
 
 ## color
 RED='\033[0;31m'
@@ -69,14 +69,22 @@ function copyFile(){
 
 }
 
-function isSuccess(){
-if [ $? -ne 0 ]; then
+function echoErrMsgAndExit() {
     echo -e "${RED}Failed${NC} to $1"
     echo ""
     exit 1
-else
+}
+
+function echoSuccessMsg() {
     echo -e "${GREEN}Succeed${NC} to $1"
     echo ""
+}
+
+function isSuccess(){
+if [ $? -ne 0 ]; then
+    echoErrMsgAndExit $1
+else
+    echoSuccessMsg $1
 fi
 }
 
@@ -84,7 +92,6 @@ function isSuccessWithoutExit(){
 if [ $? -ne 0 ]; then
     echo -e "WARN failed to $1 , but installation will continue,some function may not work properly"
 else
-    echo -e "${GREEN}Succeed${NC} to $1"
-    echo ""
+    echoSuccessMsg $1
 fi
 }

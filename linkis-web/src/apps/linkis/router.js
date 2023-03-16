@@ -22,7 +22,7 @@ export const subAppRoutes = {
   redirect: '/console',
   meta: {
     title: 'Linkis',
-    publicPage: true, // 权限公开
+    publicPage: true, // Permission disclosure(权限公开)
   },
   children: []
 }
@@ -159,6 +159,16 @@ export default [
       },
     },
     {
+      name: 'tenantTagManagement',
+      path: 'tenantTagManagement',
+      component: () =>
+        import('./module/tenantTagManagement/index.vue'),
+      meta: {
+        title: 'tenantTagManagement',
+        publicPage: true,
+      }
+    },
+    {
       name: 'errorCode',
       path: 'errorCode',
       component: () =>
@@ -169,12 +179,32 @@ export default [
       },
     },
     {
+      name: 'ipListManagement',
+      path: 'ipListManagement',
+      component: () =>
+        import('./module/ipListManagement/index.vue'),
+      meta: {
+        title: 'ipListManagement',
+        publicPage: true,
+      },
+    },
+    {
       name: 'gatewayAuthToken',
       path: 'gatewayAuthToken',
       component: () =>
         import('./module/gatewayAuthToken/index.vue'),
       meta: {
         title: 'gatewayAuthToken',
+        publicPage: true,
+      },
+    },
+    {
+      name: 'engineConfigurationTemplate',
+      path: 'engineConfigurationTemplate',
+      component: () =>
+        import('./module/engineConfigurationTemplate/index.vue'),
+      meta: {
+        title: 'engineConfigurationTemplate',
         publicPage: true,
       },
     },
@@ -239,6 +269,16 @@ export default [
       }
     },
     {
+      name: 'datasourceTypeKey',
+      path: 'datasourceTypeKey',
+      component: () =>
+        import('./module/datasourceTypeKey/index.vue'),
+      meta: {
+        title: 'datasourceTypeKey',
+        publicPage: true,
+      }
+    },
+    {
       name: 'EnginePluginManagement',
       path: 'EnginePluginManagement',
       component: () =>
@@ -247,7 +287,27 @@ export default [
         title: 'EnginePluginManagement',
         publicPage: true,
       },
-    }
+    },
+    {
+      name: 'codeQuery',
+      path: 'codeQuery',
+      component: () =>
+        import('./module/codeQuery/index.vue'),
+      meta: {
+        title: 'codeQuery',
+        publicPage: true,
+      },
+    },
+    {
+      name: 'codeDetail',
+      path: 'codeDetail',
+      component: () =>
+        import('./module/codeQuery/codeDetail/index.vue'),
+      meta: {
+        title: 'codeDetail',
+        publicPage: true,
+      },
+    },
     ],
   },
 ]

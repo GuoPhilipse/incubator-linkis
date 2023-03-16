@@ -24,11 +24,14 @@ import org.apache.commons.lang3.StringUtils
 
 import org.springframework.http.server.reactive.AbstractServerHttpRequest
 
-import javax.servlet.http.Cookie
+import javax.servlet.http.{Cookie, HttpServletRequest}
 
 import java.net.{InetSocketAddress, URI}
+import java.util
 
 import scala.collection.JavaConverters._
+
+import com.google.common.net.InetAddresses
 
 class SpringCloudGatewayHttpRequest(request: AbstractServerHttpRequest) extends GatewayHttpRequest {
 
@@ -66,6 +69,7 @@ class SpringCloudGatewayHttpRequest(request: AbstractServerHttpRequest) extends 
   }
 
   private val addCookies = new JMap[String, Array[Cookie]]
+  private val addHeaders = new JMap[String, Array[String]]
 
   private var requestBody: String = _
   private var requestURI: String = _
@@ -84,7 +88,7 @@ class SpringCloudGatewayHttpRequest(request: AbstractServerHttpRequest) extends 
   override def getHeaders: JMap[String, Array[String]] = headers
 
   override def addHeader(headerName: String, headers: Array[String]): Unit =
-    request.getHeaders.addAll(headerName, headers.toList.asJava)
+    addHeaders.put(headerName, headers)
 
   override def addCookie(cookieName: String, cookies: Array[Cookie]): Unit = {
     this.cookies.put(cookieName, cookies)
@@ -93,11 +97,44 @@ class SpringCloudGatewayHttpRequest(request: AbstractServerHttpRequest) extends 
 
   def getAddCookies: JMap[String, Array[Cookie]] = addCookies
 
+  def getAddHeaders: JMap[String, Array[String]] = addHeaders
+
   override def getQueryParams: JMap[String, Array[String]] = queryParams
 
   override def getCookies: JMap[String, Array[Cookie]] = cookies
 
   override def getRemoteAddress: InetSocketAddress = request.getRemoteAddress
+
+  override def getRequestRealIpAddr(): String = {
+    val addrList = new util.ArrayList[String]()
+    addrList.addAll(
+      Option(request.getHeaders.get("x-forwarded-for")).getOrElse(new util.ArrayList[String]())
+    )
+    addrList.addAll(
+      Option(request.getHeaders.get("Proxy-Client-IP")).getOrElse(new util.ArrayList[String]())
+    )
+    addrList.addAll(
+      Option(request.getHeaders.get("WL-Proxy-Client-IP")).getOrElse(new util.ArrayList[String]())
+    )
+    addrList.addAll(
+      Option(request.getHeaders.get("HTTP_CLIENT_IP")).getOrElse(new util.ArrayList[String]())
+    )
+    addrList.addAll(
+      Option(request.getHeaders.get("HTTP_X_FORWARDED_FOR")).getOrElse(new util.ArrayList[String]())
+    )
+
+    val afterProxyIp = addrList
+      .find(ip => {
+        StringUtils.isNotEmpty(ip) && InetAddresses.isInetAddress(ip)
+      })
+      .getOrElse("")
+
+    if (StringUtils.isNotEmpty(afterProxyIp)) {
+      afterProxyIp
+    } else {
+      request.getRemoteAddress.getAddress.getHostAddress
+    }
+  }
 
   override def getMethod: String = request.getMethodValue
 
