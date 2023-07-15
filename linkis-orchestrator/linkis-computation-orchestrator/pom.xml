@@ -26,11 +26,6 @@
   <artifactId>linkis-computation-orchestrator</artifactId>
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.linkis</groupId>
-      <artifactId>linkis-code-orchestrator</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>org.apache.linkis</groupId>
@@ -46,6 +41,11 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.linkis</groupId>
+      <artifactId>linkis-orchestrator-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
